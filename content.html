@@ -1,0 +1,212 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Innovation Bartendr</title>
+<meta http-equiv="Pragma" content="no-cache">
+<meta http-equiv="Cache-Control" Content="no-cache">
+<meta http-equiv="Expires" content="-1">
+
+<style type="text/css">
+
+html, body {height: 100%;}
+body { background-color: #ffffff; color: #111111; padding: 10px; margin: 10px; }
+
+body, p, ol, ul, td {
+font-family: verdana, arial, helvetica, sans-serif;
+font-size: 15px;
+}
+
+
+.data { width: 180px; color: #117711; padding-left: 20px; }
+
+input {    border-collapse: collapse; width: 50px; font-size: 15px; padding-left: 3px;
+    border: 1px solid #bbbbbb; background-color: #ddddee; }
+
+a { color: #2522c5; text-decoration: none; border-bottom: 1px dotted #272593; } /* none */
+a:link { color: #2522c5; text-decoration: none; border-bottom: none; }
+a:visited { color: #2522c5; text-decoration: none; border-bottom: none; }
+a:hover { color: #2522c5; background-color: #bbbbbb; text-decoration: none;  border-bottom: none;}
+
+</style>
+
+<script type="text/javascript">
+
+var GETINFOINTERVAL = 250; //ms
+
+function loaded() {
+    getInfo();
+}
+
+function openxmlhttp(theurl, functionname) {
+	  if (window.XMLHttpRequest) {// code for all new browsers
+	    xmlhttp=new XMLHttpRequest();}
+	  else if (window.ActiveXObject) {// code for IE5 and IE6
+	    xmlhttp=new ActiveXObject("Microsoft.XMLHTTP");
+	    theurl += "?" + new Date().getTime();
+	  }
+	  if (xmlhttp!=null) {
+	    xmlhttp.onreadystatechange=functionname; // event handler function call;
+	    xmlhttp.open("GET",theurl,true);
+	    xmlhttp.send(null);
+	  }
+	  else {
+	    alert("Your browser does not support XMLHTTP.");
+	  }
+}
+
+function rtmpPortReturned() { //xmlhttp event handler
+	if (xmlhttp.readyState==4) {// 4 = "loaded"
+		if (xmlhttp.status==200) {// 200 = OK
+			getFlashMovie("oculusPrime_grabber").setRtmpPort(xmlhttp.responseText);
+			var mode = "server";
+			if (initialize) { mode = "init"; }
+			getFlashMovie("oculusPrime_grabber").connect(mode);
+		}
+	}
+}
+
+function getInfo() {
+    openxmlhttp("?action=getinfo", infoReceived);
+    setTimeout("getInfo();", GETINFOINTERVAL);
+}
+
+function infoReceived() {
+	if (xmlhttp.readyState==4) {// 4 = "loaded"
+		if (xmlhttp.status==200) {// 200 = OK
+            eval(xmlhttp.responseText);
+		}
+	}
+}
+
+function inrhtml(id, str) {
+    document.getElementById(id).innerHTML = str;
+}
+
+function setviz(id, str) {
+    document.getElementById(id).style.display = str;
+}
+
+function shutdownhnow() {
+if (confirm('Are you sure?')) {
+    openxmlhttp('?action=shutdownhnow',null);
+    setTimeout("document.body.innerHTML='allow approx 30 seconds before turning power off';",500); }
+}
+
+</script>
+</head>
+<body onload="loaded();">
+
+
+Device Status: <span id="devicestatus">disconnected</span>
+<span id="connectlink">
+&nbsp; &nbsp; <a href="javascript: openxmlhttp('?action=connect',null);">CONNECT</a></span>
+<span id="disconnectlink" style="display: none;">
+&nbsp; &nbsp; <a href="javascript: openxmlhttp('?action=disconnect',null);">DISCONNECT</a></span>
+
+
+
+<table><tr><td style="height: 20px"></td></tr></table>
+
+
+<!--
+public String actuatorDirection = "unknown";
+public String currentForce = "unknown";
+public String forceTarget = "unknown";
+public String actuatorPos = "unknown";
+public String ambientTemp = "unknown";
+public String upperTemp = "unknown";
+public String upperSetpoint = "unknown";
+public String tempControlActive = "unknown";
+public String lowerTemp = "unknown";
+public String lowerSetpoint = "unknown";
+public String fan = "unknown";
+-->
+
+
+<table>
+<tr><td>Current Pressure:</td><td class="data">
+<span id="currentForce"></span></td><td>
+<a href="javascript: openxmlhttp('?action=zero',null);">ZERO</a>
+</td></tr>
+
+<tr><td>Maximum Pressure:</td><td class="data">
+<span id="forceTarget" ></span></td><td>
+<input id="forceTargetInput" type="text" value = "0"
+onkeydown = "if (event.keyCode==13) openxmlhttp('?action=forceTarget&val='+this.value,null);" /> psi
+&nbsp; <a href="javascript: openxmlhttp('?action=forceTarget&val='+document.getElementById(&quot;forceTargetInput&quot;).value,null);">
+update</a>
+</td></tr>
+
+<tr><td>Press Position:
+</td><td class="data"><span id="actuatorPos"></span></td><td>
+</td></tr>
+
+<tr><td>Press Direction:</td><td class="data">
+<span id="actuatorDirection"></span></td><td>
+<a href="javascript: openxmlhttp('?action=stop',null);">STOP</a> &nbsp;
+<a href="javascript: openxmlhttp('?action=up',null);">UP</a> &nbsp;
+<a href="javascript: openxmlhttp('?action=down',null);">DOWN</a> &nbsp;
+<a href="javascript: openxmlhttp('?action=slow',null);">SLOW</a> &nbsp;
+</td></tr>
+
+<tr><td colspan="3" style="height: 20px"></td></tr>
+
+<tr><td>Ambient Temperature:
+</td><td class="data"><span id="ambientTemp"></span></td><td>
+</td></tr>
+
+<tr><td colspan="3" style="height: 7px"></td></tr>
+
+
+<tr><td>Lower Temperature:
+</td><td class="data"><span id="lowerTemp"></span></td><td>
+</td></tr>
+
+<tr><td>Lower Setpoint:</td><td class="data">
+<span id="lowerSetpoint" ></span></td><td>
+<input id="lowerSetpointInput" type="text" value = "0"
+onkeydown = "if (event.keyCode==13) openxmlhttp('?action=lowerSetpoint&val='+this.value,null);" /> &deg;F
+&nbsp; <a href="javascript: openxmlhttp('?action=lowerSetpoint&val='+document.getElementById(&quot;lowerSetpointInput&quot;).value,null);">
+update</a>
+</td></tr>
+
+<tr><td colspan="3" style="height: 7px"></td></tr>
+
+<tr><td>Upper Temperature:
+</td><td class="data"><span id="upperTemp"></span></td><td>
+</td></tr>
+
+<tr><td>Upper Setpoint:</td><td class="data">
+<span id="upperSetpoint" ></span></td><td>
+<input id="upperSetpointInput" type="text" value = "0"
+onkeydown = "if (event.keyCode==13) openxmlhttp('?action=upperSetpoint&val='+this.value,null);" /> &deg;F
+&nbsp; <a href="javascript: openxmlhttp('?action=upperSetpoint&val='+document.getElementById(&quot;upperSetpointInput&quot;).value,null);">
+update</a>
+</td></tr>
+
+<tr><td colspan="3" style="height: 7px"></td></tr>
+
+<tr><td>Auto Heat Active:</td><td class="data">
+<span id="tempControlActive"></span></td><td>
+<a href="javascript: openxmlhttp('?action=autotempon',null);">ON</a> &nbsp;
+<a href="javascript: openxmlhttp('?action=autotempoff',null);">OFF</a> &nbsp;
+</td></tr>
+
+<tr><td>Fan:</td><td class="data">
+<span id="fan"></span></td><td>
+<a href="javascript: openxmlhttp('?action=fanon',null);">ON</a> &nbsp;
+<a href="javascript: openxmlhttp('?action=fanoff',null);">OFF</a> &nbsp;
+</td></tr>
+
+
+</table>
+
+<table><tr><td style="height: 50px"></td></tr></table>
+
+
+<a href="javascript: shutdownhnow();">Prepare system for power off</a> &nbsp;
+
+
+</body>
+</html>
